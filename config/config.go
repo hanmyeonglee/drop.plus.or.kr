@@ -17,10 +17,11 @@ type Config struct {
 	EntraClientID     string
 	EntraTenantID     string
 	EntraClientSecret string
-	DataDir           string
 	Port              string
 	BaseURL           string
+	DataDir           string
 	MaxUploadSize     int64
+	AutoDeleteSeconds int
 }
 
 var (
@@ -36,14 +37,21 @@ func LoadConfig() {
 		maxUploadMB = 50
 	}
 
+	autoDeleteStr := getEnv("AUTO_DELETE_SECONDS", "2592000")
+	autoDelete, err := strconv.Atoi(autoDeleteStr)
+	if err != nil {
+		autoDelete = 2592000
+	}
+
 	AppConfig = Config{
 		EntraClientID:     getEnv("ENTRA_CLIENT_ID", ""),
 		EntraTenantID:     getEnv("ENTRA_TENANT_ID", ""),
 		EntraClientSecret: getEnv("ENTRA_CLIENT_SECRET", ""),
-		DataDir:           getEnv("DATA_DIR", "./data"),
 		Port:              getEnv("PORT", "8080"),
 		BaseURL:           getEnv("BASE_URL", "http://localhost:8080"),
+		DataDir:           getEnv("DATA_DIR", "./data"),
 		MaxUploadSize:     maxUploadMB << 20,
+		AutoDeleteSeconds: autoDelete,
 	}
 
 	if AppConfig.EntraClientID == "" || AppConfig.EntraTenantID == "" || AppConfig.EntraClientSecret == "" {

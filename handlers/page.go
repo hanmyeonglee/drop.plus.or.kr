@@ -57,7 +57,35 @@ func HandleIndexPage(w http.ResponseWriter, r *http.Request) {
 	if err != nil || currentPage < 1 {
 		currentPage = 1
 	}
+
+	limitStr := r.URL.Query().Get("limit")
 	itemsPerPage := 5
+	if limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil {
+			switch l {
+			case 5, 10, 20, 35, 50:
+				itemsPerPage = l
+			default:
+				itemsPerPage = 5
+			}
+		}
+	}
+
+	sort := r.URL.Query().Get("sort")
+	orderClause := "uploaded_at DESC"
+	switch sort {
+	case "name":
+		orderClause = "original_name ASC"
+	case "size":
+		orderClause = "size DESC"
+	case "last_used":
+		orderClause = "last_used_at DESC"
+	case "uploaded":
+		fallthrough
+	default:
+		sort = "uploaded"
+		orderClause = "uploaded_at DESC"
+	}
 
 	var totalFiles int
 	err = models.DB.QueryRow(`SELECT COUNT(*) FROM files WHERE uploaded_by = ?`, uploader).Scan(&totalFiles)
@@ -76,7 +104,8 @@ func HandleIndexPage(w http.ResponseWriter, r *http.Request) {
 		offset = 0
 	}
 
-	rows, err := models.DB.Query(`SELECT uuid, original_name, size, uploaded_at FROM files WHERE uploaded_by = ? ORDER BY uploaded_at DESC LIMIT ? OFFSET ?`, uploader, itemsPerPage, offset)
+	query := fmt.Sprintf(`SELECT uuid, original_name, size, uploaded_at FROM files WHERE uploaded_by = ? ORDER BY %s LIMIT ? OFFSET ?`, orderClause)
+	rows, err := models.DB.Query(query, uploader, itemsPerPage, offset)
 
 	var files []FileData
 	if err == nil {
@@ -137,23 +166,27 @@ func HandleIndexPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		UserEmail   string
-		Message     string
-		Files       []FileData
-		HasPages    bool
-		CurrentPage int
-		PrevPage    int
-		NextPage    int
-		Pages       []int
+		UserEmail    string
+		Message      string
+		Files        []FileData
+		HasPages     bool
+		CurrentPage  int
+		PrevPage     int
+		NextPage     int
+		Pages        []int
+		CurrentSort  string
+		CurrentLimit int
 	}{
-		UserEmail:   uploader,
-		Message:     msg,
-		Files:       files,
-		HasPages:    totalPages > 1,
-		CurrentPage: currentPage,
-		PrevPage:    prevPage,
-		NextPage:    nextPage,
-		Pages:       pages,
+		UserEmail:    uploader,
+		Message:      msg,
+		Files:        files,
+		HasPages:     totalPages > 1,
+		CurrentPage:  currentPage,
+		PrevPage:     prevPage,
+		NextPage:     nextPage,
+		Pages:        pages,
+		CurrentSort:  sort,
+		CurrentLimit: itemsPerPage,
 	}
 
 	if err := tmpl.Execute(w, data); err != nil {

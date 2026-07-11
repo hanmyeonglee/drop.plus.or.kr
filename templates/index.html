@@ -33,6 +33,25 @@
             <button type="submit" class="btn">업로드 시작</button>
         </form>
 
+        <div class="list-controls" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; margin-top: 2rem;">
+            <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-main);">업로드한 파일</h3>
+            <form id="filter-form" method="GET" action="/" style="display: flex; gap: 0.5rem;">
+                <select name="sort" style="padding: 0.4rem; border-radius: 6px; border: 1px solid var(--border); font-size: 0.85rem; background: var(--surface);">
+                    <option value="uploaded" {{if eq .CurrentSort "uploaded"}}selected{{end}}>업로드 날짜순</option>
+                    <option value="name" {{if eq .CurrentSort "name"}}selected{{end}}>이름순</option>
+                    <option value="size" {{if eq .CurrentSort "size"}}selected{{end}}>용량순</option>
+                    <option value="last_used" {{if eq .CurrentSort "last_used"}}selected{{end}}>마지막 조회순</option>
+                </select>
+                <select name="limit" style="padding: 0.4rem; border-radius: 6px; border: 1px solid var(--border); font-size: 0.85rem; background: var(--surface);">
+                    <option value="5" {{if eq .CurrentLimit 5}}selected{{end}}>5개씩</option>
+                    <option value="10" {{if eq .CurrentLimit 10}}selected{{end}}>10개씩</option>
+                    <option value="20" {{if eq .CurrentLimit 20}}selected{{end}}>20개씩</option>
+                    <option value="35" {{if eq .CurrentLimit 35}}selected{{end}}>35개씩</option>
+                    <option value="50" {{if eq .CurrentLimit 50}}selected{{end}}>50개씩</option>
+                </select>
+                <button type="submit" class="btn-outline" style="padding: 0.4rem 0.8rem; cursor: pointer;">적용</button>
+            </form>
+        </div>
         <div class="file-list-card">
             <table class="file-table">
                 <colgroup>
@@ -99,19 +118,19 @@
         {{if .HasPages}}
         <div class="pagination">
             {{if .PrevPage}}
-            <a href="/?page={{.PrevPage}}" class="page-link">&lt;</a>
+            <a href="/?page={{.PrevPage}}&sort={{$.CurrentSort}}&limit={{$.CurrentLimit}}" class="page-link">&lt;</a>
             {{end}}
             
             {{range .Pages}}
                 {{if eq . $.CurrentPage}}
                 <span class="page-link active">{{.}}</span>
                 {{else}}
-                <a href="/?page={{.}}" class="page-link">{{.}}</a>
+                <a href="/?page={{.}}&sort={{$.CurrentSort}}&limit={{$.CurrentLimit}}" class="page-link">{{.}}</a>
                 {{end}}
             {{end}}
 
             {{if .NextPage}}
-            <a href="/?page={{.NextPage}}" class="page-link">&gt;</a>
+            <a href="/?page={{.NextPage}}&sort={{$.CurrentSort}}&limit={{$.CurrentLimit}}" class="page-link">&gt;</a>
             {{end}}
         </div>
         {{end}}

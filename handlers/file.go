@@ -98,7 +98,9 @@ func HandleDownloadFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	filePath := filepath.Join(config.AppConfig.DataDir, "uploads", fileUUID)
-
+	
+	models.DB.Exec(`UPDATE files SET last_used_at = CURRENT_TIMESTAMP WHERE uuid = ?`, fileUUID)
+	
 	if r.URL.Query().Get("download") == "true" {
 		w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, originalName))
 	} else {

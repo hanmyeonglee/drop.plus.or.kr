@@ -12,6 +12,8 @@ import (
 func main() {
 	config.LoadConfig()
 	models.InitDB(config.AppConfig.DataDir)
+	
+	models.StartAutoDeleteScheduler()
 
 	mux := http.NewServeMux()
 

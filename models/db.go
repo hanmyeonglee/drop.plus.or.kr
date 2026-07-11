@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -31,12 +32,20 @@ func InitDB(dataDir string) {
 			original_name TEXT NOT NULL,
 			uploaded_by TEXT NOT NULL,
 			size INTEGER NOT NULL,
-			uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP
+			uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			last_used_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);
 	`
 	if _, err := DB.Exec(createTableQuery); err != nil {
 		log.Fatalf("Failed to create table: %v", err)
 	}
+
+	_, err = DB.Exec(`ALTER TABLE files ADD COLUMN last_used_at DATETIME DEFAULT CURRENT_TIMESTAMP`)
+	if err != nil && !strings.Contains(err.Error(), "duplicate column name") {
+		log.Printf("[WARN] Failed to add last_used_at column: %v", err)
+	}
+
+	DB.Exec(`UPDATE files SET last_used_at = uploaded_at WHERE last_used_at IS NULL`)
 
 	log.Println("[INFO] SQLite DB initialized")
 }
