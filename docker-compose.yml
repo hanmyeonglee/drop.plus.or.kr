@@ -1,0 +1,14 @@
+services:
+  drop-server:
+    build: .
+    environment:
+      - PORT=80
+      - DATA_DIR=/app/data
+      - ENTRA_CLIENT_ID=dummy
+      - ENTRA_TENANT_ID=dummy
+      - ENTRA_CLIENT_SECRET=dummy
+    volumes:
+      - ./data:/app/data
+    ports:
+      - "8080:80"
+    restart: unless-stopped
