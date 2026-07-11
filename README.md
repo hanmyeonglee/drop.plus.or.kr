@@ -25,8 +25,11 @@
 
 서버 실행을 위해 다음 환경 변수들을 설정할 수 있습니다. (현재는 테스트 모드로 동작 가능)
 - `PORT`: 실행 포트 (기본값: `8080`)
+- `BASE_URL`: 서버 기본 주소 (기본값: `http://localhost:8080`)
 - `DATA_DIR`: 파일과 DB가 저장될 경로 (기본값: `./data`)
 - `MAX_UPLOAD_SIZE_MB`: 단일 파일 업로드 최대 용량 제한 (기본값: `50`)
+- `AUTO_DELETE_SECONDS`: 마지막 조회 후 자동 삭제되기까지의 시간(초) (기본값: `2592000` / 30일, 0 이면 비활성화)
+- `SESSION_KEY`: 세션 암호화 키 (기본값: 랜덤 생성)
 - `ENTRA_CLIENT_ID`, `ENTRA_TENANT_ID`, `ENTRA_CLIENT_SECRET`: Microsoft Entra ID 연동용
 
 ### Standalone 모드로 실행 (nginx-proxy 없이)
