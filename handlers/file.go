@@ -30,7 +30,11 @@ func HandleUploadFile(w http.ResponseWriter, r *http.Request) {
 	defer file.Close()
 
 	newUUID := uuid.New().String()
-	uploader := "testuser@drop.plus.or.kr" // Dummy auth
+	uploader, ok := r.Context().Value(UserEmailKey).(string)
+	if !ok || uploader == "" {
+		redirectWithMessage(w, r, "인증이 필요합니다.")
+		return
+	}
 
 	savePath := filepath.Join(config.AppConfig.DataDir, "uploads", newUUID)
 	dst, err := os.Create(savePath)
@@ -59,11 +63,23 @@ func HandleUploadFile(w http.ResponseWriter, r *http.Request) {
 
 func HandleDeleteFile(w http.ResponseWriter, r *http.Request) {
 	fileUUID := r.PathValue("uuid")
+
+	uploader, ok := r.Context().Value(UserEmailKey).(string)
+	if !ok || uploader == "" {
+		redirectWithMessage(w, r, "인증이 필요합니다.")
+		return
+	}
 	
-	// Delete from DB
-	_, err := models.DB.Exec(`DELETE FROM files WHERE uuid = ?`, fileUUID)
+	// Delete from DB with ownership check
+	res, err := models.DB.Exec(`DELETE FROM files WHERE uuid = ? AND uploaded_by = ?`, fileUUID, uploader)
 	if err != nil {
 		redirectWithMessage(w, r, "삭제 실패")
+		return
+	}
+
+	rowsAffected, _ := res.RowsAffected()
+	if rowsAffected == 0 {
+		redirectWithMessage(w, r, "파일이 없거나 삭제 권한이 없습니다.")
 		return
 	}
 

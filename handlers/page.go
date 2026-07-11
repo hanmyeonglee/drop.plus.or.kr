@@ -39,7 +39,11 @@ func HandleIndexPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uploader := "testuser@drop.plus.or.kr" // Dummy auth
+	uploader, ok := r.Context().Value(UserEmailKey).(string)
+	if !ok || uploader == "" {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 
 	// 1. Pagination 변수 설정
 	pageStr := r.URL.Query().Get("page")
