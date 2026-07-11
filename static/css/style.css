@@ -236,10 +236,17 @@ input[type="file"]::file-selector-button:hover {
   border-collapse: collapse;
   table-layout: fixed;
 }
-.file-table th, .file-table td {
-  padding: 1.25rem 1.5rem;
+.file-table th {
+  padding: 0.6rem 1rem;
   text-align: center;
   border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.file-table td {
+  padding: 0;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
 }
 .file-table th {
   background-color: var(--surface);
