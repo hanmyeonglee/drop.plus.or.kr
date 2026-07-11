@@ -86,10 +86,10 @@ drop.plus.or.kr/
 ├── .gitignore
 ├── README.md                 # 현재 문서
 ├── docker-compose.yml        # nginx-proxy 및 앱 컨테이너 오케스트레이션 구성
+├── docker-compose.override.yml # 환경 변수 및 인증 설정 로드 로직
 ├── Dockerfile                # Go 애플리케이션 멀티 스테이지 빌드 설정
 ├── go.mod                    # Go 모듈 종속성 정의
 ├── main.go                   # 애플리케이션 진입점 및 HTTP 서버 초기화
-├── config/                   # 환경 변수 및 인증 설정 로드 로직
 ├── handlers/                 # HTTP 라우트 핸들러 (메인, 로그인, 콜백, 업로드, 다운로드)
 ├── models/                   # SQLite3 DB 초기화 및 데이터 쿼리 로직
 ├── templates/                # 순수 HTML 템플릿 폴더 (JS 없음)
