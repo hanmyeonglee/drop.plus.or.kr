@@ -27,16 +27,19 @@
         <form action="/files" method="POST" enctype="multipart/form-data" class="upload-section">
             <div class="input-group">
                 <label>새 파일 업로드</label>
-                <div class="custom-file-upload">
-                    <input type="file" name="file" required>
-                    <span>이곳을 클릭하여 업로드할 파일을 선택하세요</span>
-                </div>
+                <input type="file" name="file" required>
             </div>
             <button type="submit" class="btn">업로드 시작</button>
         </form>
 
         <div class="file-list-card">
             <table class="file-table">
+                <colgroup>
+                    <col style="width: 45%;">
+                    <col style="width: 15%;">
+                    <col style="width: 25%;">
+                    <col style="width: 15%;">
+                </colgroup>
                 <thead>
                     <tr>
                         <th>파일명</th>
@@ -54,10 +57,21 @@
                         <td class="file-meta">{{.Size}}</td>
                         <td class="file-meta">{{.UploadedAt}}</td>
                         <td class="actions">
-                            <a href="/files/{{.UUID}}?download=true" class="btn btn-outline">다운로드</a>
+                            <a href="/files/{{.UUID}}?download=true" class="btn btn-ghost btn-icon action-btn" title="다운로드">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                            </a>
                             <form action="/files/{{.UUID}}" method="POST" class="inline-form" onsubmit="return confirm('정말 이 파일을 삭제하시겠습니까?');">
                                 <input type="hidden" name="_method" value="DELETE">
-                                <button type="submit" class="btn btn-danger">삭제</button>
+                                <button type="submit" class="btn btn-danger btn-icon action-btn" title="삭제">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    </svg>
+                                </button>
                             </form>
                         </td>
                     </tr>
