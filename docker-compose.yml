@@ -2,10 +2,6 @@ services:
   drop-server:
     build: .
     environment:
-      - PORT=80
       - DATA_DIR=/app/data
     volumes:
       - ./data:/app/data
-    ports:
-      - "8080:80"
-    restart: unless-stopped
