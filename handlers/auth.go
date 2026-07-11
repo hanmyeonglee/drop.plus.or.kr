@@ -1,16 +1,26 @@
 package handlers
 
 import (
-	"fmt"
+	"html/template"
+	"log"
 	"net/http"
 )
 
 func HandleLogin(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Entra ID 로그인 페이지로 리다이렉트 됩니다... (구현 예정)")
+	tmpl, err := template.ParseFiles("templates/login.html")
+	if err != nil {
+		log.Printf("Template parsing error: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	
+	if err := tmpl.Execute(w, nil); err != nil {
+		log.Printf("Template execution error: %v", err)
+	}
 }
 
 func HandleAuthCallback(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "인증 콜백 처리 및 세션 생성 (구현 예정)")
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func HandleLogout(w http.ResponseWriter, r *http.Request) {

@@ -4,32 +4,33 @@ import (
 	"log"
 	"net/http"
 
+	"drop.plus.or.kr/config"
 	"drop.plus.or.kr/handlers"
+	"drop.plus.or.kr/models"
 )
 
 func main() {
+	config.LoadConfig()
+	models.InitDB(config.AppConfig.DataDir)
+
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /login", handlers.HandleLogin)
 	mux.HandleFunc("GET /auth/callback", handlers.HandleAuthCallback)
 	mux.HandleFunc("POST /logout", handlers.HandleLogout)
-	// - 페이지 렌더링
-	mux.HandleFunc("GET /", handlers.HandleIndexPage) // 메인 페이지 (파일 목록)
+	mux.HandleFunc("GET /", handlers.HandleIndexPage)
 
-	// - 정적 파일 서빙 (CSS 등)
 	fs := http.FileServer(http.Dir("static"))
 	mux.Handle("GET /static/", http.StripPrefix("/static/", fs))
-
 
 	mux.HandleFunc("POST /files", handlers.HandleUploadFile)
 	mux.HandleFunc("GET /files/{uuid}", handlers.HandleDownloadFile)
 	mux.HandleFunc("DELETE /files/{uuid}", handlers.HandleDeleteFile)
 	
 	handler := handlers.MethodOverrideMiddleware(mux)
-
-	port := ":80"
-	log.Printf("서버가 %s 포트에서 시작되었습니다.\n", port)
+	port := ":" + config.AppConfig.Port
+	log.Printf("Server started on port %s", port)
 	if err := http.ListenAndServe(port, handler); err != nil {
-		log.Fatalf("서버 실행 실패: %v", err)
+		log.Fatalf("Server failed: %v", err)
 	}
 }
