@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 
 	"drop.plus.or.kr/models"
 )
@@ -32,7 +33,13 @@ func formatSize(bytes int64) string {
 }
 
 func HandleIndexPage(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("templates/index.html")
+	tmplName := "templates/index.html"
+	ua := strings.ToLower(r.UserAgent())
+	if strings.Contains(ua, "mobile") || strings.Contains(ua, "android") || strings.Contains(ua, "iphone") {
+		tmplName = "templates/index_mobile.html"
+	}
+	
+	tmpl, err := template.ParseFiles(tmplName)
 	if err != nil {
 		log.Printf("Template parsing error: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

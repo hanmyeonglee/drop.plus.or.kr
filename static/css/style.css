@@ -125,6 +125,7 @@ header {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  padding: 1.5rem;
 }
 .auth-card {
   background: var(--surface);
@@ -139,6 +140,11 @@ header {
   margin-bottom: 0.5rem;
   color: var(--text-main);
   font-size: 1.75rem;
+}
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 2.5rem 1.5rem;
+  }
 }
 .auth-card p {
   color: var(--text-muted);
@@ -333,4 +339,11 @@ input[type="file"]::file-selector-button:hover {
 @keyframes slideIn {
   from { transform: translateY(-10px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
+}
+
+.upload-form {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  align-items: flex-end;
 }

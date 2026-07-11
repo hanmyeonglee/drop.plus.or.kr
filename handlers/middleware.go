@@ -14,7 +14,7 @@ const UserEmailKey contextKey = "user_email"
 
 func SecurityHeadersMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		csp := "default-src 'none'; script-src 'none'; style-src 'self' 'unsafe-inline'; img-src * data:; font-src * data:; media-src * data:; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none';"
+		csp := "default-src 'none'; script-src 'sha256-J97eXDtl4VHZEtwNtJMVopziv3FQiRVccGNHyxbVM+M='; style-src 'self' 'unsafe-inline'; img-src * data:; font-src * data:; media-src * data:; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none';"
 		if strings.HasPrefix(r.URL.Path, "/files/") && r.Method == http.MethodGet {
 			csp = "default-src 'none'; style-src * 'unsafe-inline'; img-src * data:; font-src * data:; media-src * data:; sandbox"
 		}

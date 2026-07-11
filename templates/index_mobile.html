@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PLUS Drop</title>
+    <style>
+        :root {
+            --primary: #06b6d4;
+            --bg-color: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --danger: #ef4444;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0; padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--surface);
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 10;
+        }
+        .header h1 {
+            margin: 0; font-size: 1.25rem; color: var(--primary);
+        }
+        .header .user-actions {
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .btn-outline {
+            background: transparent; border: 1px solid var(--border);
+            padding: 0.4rem 0.8rem; border-radius: 6px; color: var(--text-muted);
+            font-size: 0.85rem; cursor: pointer;
+        }
+        .container {
+            padding: 1rem;
+        }
+        .upload-card {
+            background: var(--surface);
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+        .upload-card label {
+            display: block; font-weight: 600; margin-bottom: 0.75rem; font-size: 0.95rem;
+        }
+        .file-input-wrapper {
+            display: flex; flex-direction: column; gap: 0.75rem;
+        }
+        input[type="file"] {
+            width: 100%; border: 1px dashed var(--border); padding: 0.5rem;
+            border-radius: 8px; font-size: 0.9rem; box-sizing: border-box;
+            background-color: var(--surface);
+        }
+        input[type="file"]::file-selector-button {
+            background-color: var(--primary); color: white; border: none;
+            border-radius: 6px; padding: 0.5rem 1rem; margin-right: 1rem;
+            font-weight: 500; font-size: 0.9rem;
+        }
+        .btn-primary {
+            background: var(--primary); color: white; border: none;
+            padding: 0.75rem; border-radius: 8px; font-weight: 600;
+            width: 100%; font-size: 1rem; cursor: pointer;
+        }
+        .file-list {
+            display: flex; flex-direction: column; gap: 0.75rem;
+        }
+        .file-item {
+            background: var(--surface); padding: 1rem; border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; gap: 0.5rem;
+        }
+        .file-name {
+            font-weight: 600; font-size: 0.95rem; word-break: break-all;
+        }
+        .file-meta {
+            font-size: 0.8rem; color: var(--text-muted);
+            display: flex; justify-content: space-between;
+        }
+        .file-actions {
+            display: flex; justify-content: flex-end; gap: 0.5rem;
+            margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--bg-color);
+        }
+        .btn-icon {
+            background: transparent; border: none; color: var(--text-muted);
+            padding: 0.5rem; border-radius: 8px; display: inline-flex;
+            align-items: center; justify-content: center; cursor: pointer;
+        }
+        .btn-icon.danger { color: var(--danger); }
+        .alert {
+            padding: 1rem; border-radius: 8px; margin-bottom: 1rem;
+            background: #ecfeff; color: #0e7490; border: 1px solid #a5f3fc;
+            font-size: 0.9rem;
+        }
+        
+        .pagination { display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.5rem; }
+        .page-link { padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid var(--border); color: var(--text-muted); text-decoration: none;}
+        .page-link.active { background: var(--primary); color: white; border-color: var(--primary); }
+    </style>
+    <script src="/static/js/main.js" integrity="sha256-J97eXDtl4VHZEtwNtJMVopziv3FQiRVccGNHyxbVM+M=" defer></script>
+</head>
+<body>
+    <header class="header">
+        <h1>PLUS Drop</h1>
+        <div class="user-actions">
+            <form action="/logout" method="POST" style="margin:0;">
+                <button type="submit" class="btn-outline">로그아웃</button>
+            </form>
+        </div>
+    </header>
+
+    <div class="container">
+        {{if .Message}}
+        <div class="alert">
+            {{.Message}}
+        </div>
+        {{end}}
+
+        <div class="upload-card">
+            <form action="/files" method="POST" enctype="multipart/form-data" class="file-input-wrapper">
+                <label>새 파일 업로드</label>
+                <input type="file" name="file" required>
+                <button type="submit" class="btn-primary">업로드</button>
+            </form>
+        </div>
+
+        <div class="file-list">
+            {{range .Files}}
+            <div class="file-item">
+                <div class="file-name">{{.OriginalName}}</div>
+                <div class="file-meta">
+                    <span>{{.Size}}</span>
+                    <span>{{.UploadedAt}}</span>
+                </div>
+                <div class="file-actions">
+                    <button type="button" class="btn-icon share-btn" data-share-id="{{.UUID}}" data-share-name="{{.OriginalName}}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                    </button>
+                    <a href="/files/{{.UUID}}?download=true" class="btn-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    </a>
+                    <form action="/files/{{.UUID}}" method="POST" onsubmit="return confirm('삭제하시겠습니까?');" style="margin:0;">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button type="submit" class="btn-icon danger">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {{end}}
+        </div>
+
+        {{if .HasPages}}
+        <div class="pagination">
+            {{if .PrevPage}}
+            <a href="/?page={{.PrevPage}}" class="page-link">&lt;</a>
+            {{end}}
+            
+            {{range .Pages}}
+                {{if eq . $.CurrentPage}}
+                <span class="page-link active">{{.}}</span>
+                {{else}}
+                <a href="/?page={{.}}" class="page-link">{{.}}</a>
+                {{end}}
+            {{end}}
+
+            {{if .NextPage}}
+            <a href="/?page={{.NextPage}}" class="page-link">&gt;</a>
+            {{end}}
+        </div>
+        {{end}}
+    </div>
+</body>
+</html>
