@@ -26,6 +26,14 @@ func main() {
 	fs := http.FileServer(http.Dir("static"))
 	mux.Handle("GET /static/", http.StripPrefix("/static/", fs))
 
+	mux.HandleFunc("GET /manifest.json", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "static/public/manifest.json")
+	})
+	mux.HandleFunc("GET /sw.js", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/javascript")
+		http.ServeFile(w, r, "static/js/sw.js")
+	})
+
 	mux.HandleFunc("POST /files", handlers.HandleUploadFile)
 	mux.HandleFunc("GET /files/{uuid}", handlers.HandleDownloadFile)
 	mux.HandleFunc("DELETE /files/{uuid}", handlers.HandleDeleteFile)
