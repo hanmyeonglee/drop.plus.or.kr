@@ -52,7 +52,6 @@ func LoadConfig() {
 		log.Println("[INFO] Config loaded")
 	}
 
-	// Setup OAuth2
 	OAuthConfig = &oauth2.Config{
 		ClientID:     AppConfig.EntraClientID,
 		ClientSecret: AppConfig.EntraClientSecret,
@@ -61,7 +60,6 @@ func LoadConfig() {
 		Endpoint:     microsoft.AzureADEndpoint(AppConfig.EntraTenantID),
 	}
 
-	// Setup Session Store
 	sessionKey := getEnv("SESSION_KEY", "")
 	if sessionKey == "" {
 		key := make([]byte, 32)
@@ -71,7 +69,7 @@ func LoadConfig() {
 	Store = sessions.NewCookieStore([]byte(sessionKey))
 	Store.Options = &sessions.Options{
 		Path:     "/",
-		MaxAge:   86400 * 7, // 7 days
+		MaxAge:   86400 * 7,
 		HttpOnly: true,
 		Secure:   strings.HasPrefix(AppConfig.BaseURL, "https://"),
 		SameSite: http.SameSiteLaxMode,

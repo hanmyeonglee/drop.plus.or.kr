@@ -69,8 +69,7 @@ func HandleDeleteFile(w http.ResponseWriter, r *http.Request) {
 		redirectWithMessage(w, r, "인증이 필요합니다.")
 		return
 	}
-	
-	// Delete from DB with ownership check
+
 	res, err := models.DB.Exec(`DELETE FROM files WHERE uuid = ? AND uploaded_by = ?`, fileUUID, uploader)
 	if err != nil {
 		redirectWithMessage(w, r, "삭제 실패")
@@ -83,7 +82,6 @@ func HandleDeleteFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Delete physical file
 	os.Remove(filepath.Join(config.AppConfig.DataDir, "uploads", fileUUID))
 
 	redirectWithMessage(w, r, "파일이 삭제되었습니다")
@@ -91,7 +89,7 @@ func HandleDeleteFile(w http.ResponseWriter, r *http.Request) {
 
 func HandleDownloadFile(w http.ResponseWriter, r *http.Request) {
 	fileUUID := r.PathValue("uuid")
-	
+
 	var originalName string
 	err := models.DB.QueryRow(`SELECT original_name FROM files WHERE uuid = ?`, fileUUID).Scan(&originalName)
 	if err != nil {
@@ -100,7 +98,7 @@ func HandleDownloadFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	filePath := filepath.Join(config.AppConfig.DataDir, "uploads", fileUUID)
-	
+
 	if r.URL.Query().Get("download") == "true" {
 		w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, originalName))
 	} else {

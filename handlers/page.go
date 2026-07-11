@@ -45,15 +45,13 @@ func HandleIndexPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 1. Pagination 변수 설정
 	pageStr := r.URL.Query().Get("page")
 	currentPage, err := strconv.Atoi(pageStr)
 	if err != nil || currentPage < 1 {
 		currentPage = 1
 	}
-	itemsPerPage := 5 // 한 페이지당 보여줄 파일 수 (테스트를 위해 5개로 설정)
+	itemsPerPage := 5
 
-	// 2. 전체 파일 수 카운트
 	var totalFiles int
 	err = models.DB.QueryRow(`SELECT COUNT(*) FROM files WHERE uploaded_by = ?`, uploader).Scan(&totalFiles)
 	if err != nil {
@@ -71,9 +69,8 @@ func HandleIndexPage(w http.ResponseWriter, r *http.Request) {
 		offset = 0
 	}
 
-	// 3. DB 조회 (Limit & Offset 적용)
 	rows, err := models.DB.Query(`SELECT uuid, original_name, size, uploaded_at FROM files WHERE uploaded_by = ? ORDER BY uploaded_at DESC LIMIT ? OFFSET ?`, uploader, itemsPerPage, offset)
-	
+
 	var files []FileData
 	if err == nil {
 		defer rows.Close()
@@ -103,11 +100,10 @@ func HandleIndexPage(w http.ResponseWriter, r *http.Request) {
 		msg, _ = url.QueryUnescape(msg)
 	}
 
-	// 4. 페이지네이션 배열 계산 (현재 페이지 기준 앞뒤 2개씩 노출)
 	var pages []int
 	startPage := currentPage - 2
 	endPage := currentPage + 2
-	
+
 	if startPage < 1 {
 		endPage += (1 - startPage)
 		startPage = 1
@@ -122,12 +118,12 @@ func HandleIndexPage(w http.ResponseWriter, r *http.Request) {
 	for i := startPage; i <= endPage; i++ {
 		pages = append(pages, i)
 	}
-	
+
 	prevPage := 0
 	if currentPage > 1 {
 		prevPage = currentPage - 1
 	}
-	
+
 	nextPage := 0
 	if currentPage < totalPages {
 		nextPage = currentPage + 1

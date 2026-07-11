@@ -27,8 +27,7 @@ func main() {
 	mux.HandleFunc("POST /files", handlers.HandleUploadFile)
 	mux.HandleFunc("GET /files/{uuid}", handlers.HandleDownloadFile)
 	mux.HandleFunc("DELETE /files/{uuid}", handlers.HandleDeleteFile)
-	
-	// Apply middlewares
+
 	handler := handlers.MethodOverrideMiddleware(mux)
 	handler = handlers.AuthMiddleware(handler)
 	handler = handlers.SecurityHeadersMiddleware(handler)

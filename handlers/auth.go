@@ -14,7 +14,6 @@ import (
 )
 
 func HandleLogin(w http.ResponseWriter, r *http.Request) {
-	// Redirect to main if already logged in
 	session, _ := config.Store.Get(r, "drop-session")
 	if _, ok := session.Values["user_email"].(string); ok {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -48,7 +47,7 @@ func HandleAuthLogin(w http.ResponseWriter, r *http.Request) {
 func HandleAuthCallback(w http.ResponseWriter, r *http.Request) {
 	session, _ := config.Store.Get(r, "drop-session")
 	savedState, ok := session.Values["oauth_state"].(string)
-	
+
 	if !ok || r.URL.Query().Get("state") != savedState {
 		http.Error(w, "Invalid state parameter", http.StatusBadRequest)
 		return
@@ -62,20 +61,18 @@ func HandleAuthCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Extract ID token (JWT)
 	rawIDToken, ok := token.Extra("id_token").(string)
 	if !ok {
 		http.Error(w, "No id_token found", http.StatusInternalServerError)
 		return
 	}
 
-	// Parse JWT Payload manually without verification (since it came directly from token endpoint via HTTPS)
 	parts := strings.Split(rawIDToken, ".")
 	if len(parts) < 2 {
 		http.Error(w, "Invalid id_token format", http.StatusInternalServerError)
 		return
 	}
-	
+
 	payload, err := base64.RawURLEncoding.DecodeString(parts[1])
 	if err != nil {
 		http.Error(w, "Failed to decode id_token payload", http.StatusInternalServerError)
@@ -83,7 +80,7 @@ func HandleAuthCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var claims struct {
-		PreferredUsername string `json:"preferred_username"` // Usually the email in Entra
+		PreferredUsername string `json:"preferred_username"`
 		Email             string `json:"email"`
 	}
 	json.Unmarshal(payload, &claims)
@@ -106,7 +103,7 @@ func HandleAuthCallback(w http.ResponseWriter, r *http.Request) {
 
 func HandleLogout(w http.ResponseWriter, r *http.Request) {
 	session, _ := config.Store.Get(r, "drop-session")
-	session.Options.MaxAge = -1 // Expire cookie
+	session.Options.MaxAge = -1
 	session.Save(r, w)
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
