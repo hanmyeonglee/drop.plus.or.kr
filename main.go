@@ -13,8 +13,13 @@ func main() {
 	mux.HandleFunc("GET /login", handlers.HandleLogin)
 	mux.HandleFunc("GET /auth/callback", handlers.HandleAuthCallback)
 	mux.HandleFunc("POST /logout", handlers.HandleLogout)
+	// - 페이지 렌더링
+	mux.HandleFunc("GET /", handlers.HandleIndexPage) // 메인 페이지 (파일 목록)
 
-	mux.HandleFunc("GET /", handlers.HandleIndexPage)
+	// - 정적 파일 서빙 (CSS 등)
+	fs := http.FileServer(http.Dir("static"))
+	mux.Handle("GET /static/", http.StripPrefix("/static/", fs))
+
 
 	mux.HandleFunc("POST /files", handlers.HandleUploadFile)
 	mux.HandleFunc("GET /files/{uuid}", handlers.HandleDownloadFile)
